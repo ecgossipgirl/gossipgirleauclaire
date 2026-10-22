@@ -1,0 +1,534 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Eau Claire Gossip</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Jost:wght@200;300;400;500;600&display=swap">
+<style>
+/* Layout: dark city-night stage, giant thin wordmark, breaking ticker, then three columns: colored menu | content | round nav buttons. Stacks on phones. */
+:root {
+  --ink: #07080d;
+  --title: #e6efa6;
+  --blue: #2aa8e0;
+  --orange: #f08a3c;
+  --yellow: #e8d85a;
+  --pink: #ee5aa0;
+  --green: #7ed957;
+  --red: #ff5a5f;
+  --card: #ffffff;
+  --card-ink: #15161c;
+  --card-mute: #6b6e7a;
+  --light: #d9dce6;
+  --mute: #98a0b8;
+  --line: rgba(255,255,255,.1);
+  --panel: rgba(10, 12, 20, .8);
+  --field: #0b0d16;
+  --display: "Jost", "Century Gothic", "Avenir Next", "Futura", sans-serif;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html, body { background: var(--ink); }
+body {
+  margin: 0; color: var(--light); font-family: var(--display); font-weight: 300; line-height: 1.45;
+  padding-block: 28px 40px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  min-height: 100vh; position: relative; overflow-x: hidden;
+}
+#city { position: fixed; inset: 0; width: 100%; height: 100%; z-index: 0; display: block; }
+.stage { position: relative; z-index: 1; max-width: 980px; margin: 0 auto; }
+
+h1.mark {
+  margin: 0 0 18px; text-align: center; font-weight: 200;
+  font-size: clamp(54px, 12vw, 118px); letter-spacing: -0.035em; line-height: .95;
+  color: var(--title); text-shadow: 0 0 40px rgba(230,239,166,.28); text-wrap: balance;
+}
+.mark small { display: block; margin-top: 10px; font-size: clamp(11px, 1.6vw, 14px); font-weight: 400; letter-spacing: .34em; text-transform: uppercase; color: #9aa0b4; text-shadow: none; }
+
+.ticker {
+  all: unset; box-sizing: border-box; display: flex; align-items: center; gap: 12px; width: 100%; cursor: pointer;
+  margin: 0 0 22px; padding: 9px 14px; border-radius: 10px;
+  background: rgba(255,90,95,.12); border: 1px solid rgba(255,90,95,.45); color: #fff; font-size: 14px; font-weight: 400;
+}
+.ticker[hidden] { display: none; }
+.ticker:focus-visible { outline: 2px solid var(--title); outline-offset: 3px; }
+.ticker b { flex: none; background: var(--red); color: #20080a; font-size: 11px; font-weight: 600; letter-spacing: .16em; padding: 3px 8px; border-radius: 4px; }
+.ticker span { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+.grid { display: grid; grid-template-columns: 210px minmax(0, 1fr) 76px; gap: 28px; align-items: start; }
+.grid > * { min-width: 0; }
+
+.menu { display: flex; flex-direction: column; gap: 16px; }
+.menu button.item { all: unset; display: block; cursor: pointer; border-radius: 6px; }
+.menu button.item:focus-visible { outline: 2px solid var(--title); outline-offset: 4px; }
+.menu .h { display: block; font-size: 25px; font-weight: 500; letter-spacing: -0.01em; line-height: 1.05; transition: transform .2s; }
+.menu .t { display: block; font-size: 11.5px; line-height: 1.35; color: var(--light); margin-top: 3px; max-width: 190px; }
+.menu button.item:hover .h { transform: translateX(3px); }
+.menu button.item[aria-current="true"] .h { text-decoration: underline; text-underline-offset: 6px; text-decoration-thickness: 2px; }
+.c-blue .h { color: var(--blue); } .c-orange .h { color: var(--orange); } .c-red .h { color: var(--red); }
+.c-yellow .h { color: var(--yellow); } .c-pink .h { color: var(--pink); } .c-green .h { color: var(--green); }
+
+.card { background: var(--card); color: var(--card-ink); border-radius: 14px; padding: 14px 16px 12px; box-shadow: 0 0 0 1px rgba(255,255,255,.06), 0 24px 70px rgba(0,0,0,.6), 0 0 90px rgba(42,168,224,.12); font-weight: 400; }
+.card h2 { margin: 0 0 10px; text-align: center; font-size: 17px; font-weight: 500; min-height: 1.3em; }
+.photo { position: relative; aspect-ratio: 4 / 3.4; border-radius: 4px; overflow: hidden; background: #1b2236; }
+.photo canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.photo .where { position: absolute; left: 10px; bottom: 10px; right: 10px; display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; font-size: 11px; font-weight: 500; letter-spacing: .14em; text-transform: uppercase; color: #fff; text-shadow: 0 1px 8px rgba(0,0,0,.7); }
+.card p.blurb { margin: 11px 4px 4px; text-align: center; font-size: 13.5px; line-height: 1.45; color: #2a2c36; text-wrap: pretty; min-height: 1.4em; }
+.card .sig { margin: 8px 4px 0; display: flex; align-items: center; justify-content: space-between; gap: 8px; font-size: 10.5px; color: var(--card-mute); }
+.card .sig b { color: #3b6fb8; font-weight: 600; letter-spacing: .08em; }
+.pager { display: flex; gap: 6px; }
+.pager button { all: unset; cursor: pointer; width: 26px; height: 26px; border-radius: 50%; display: grid; place-items: center; background: #eceef4; color: #3a3d4a; font-size: 14px; }
+.pager button:hover { background: #dfe3ee; }
+.pager button:focus-visible { outline: 2px solid #3b6fb8; outline-offset: 2px; }
+.dots { display: flex; gap: 5px; justify-content: center; margin-top: 10px; min-height: 6px; }
+.dots i { width: 6px; height: 6px; border-radius: 50%; background: #d3d6e0; }
+.dots i.on { background: #3b6fb8; transform: scale(1.25); }
+
+.nav { display: flex; flex-direction: column; gap: 14px; align-items: center; }
+.nav button { all: unset; cursor: pointer; position: relative; width: 58px; height: 58px; border-radius: 50%; display: grid; place-items: end center; padding-bottom: 5px; font-size: 10.5px; font-weight: 500; color: #fff; border: 3px solid #b9a44a; background: radial-gradient(circle at 35% 30%, #5b6178, #1d2030 70%); box-shadow: 0 4px 16px rgba(0,0,0,.55), inset 0 -18px 18px rgba(0,0,0,.35); transition: transform .2s, border-color .2s; }
+.nav button:hover { transform: scale(1.06); }
+.nav button:focus-visible { outline: 2px solid var(--title); outline-offset: 3px; }
+.nav button[aria-current="true"] { border-color: var(--title); box-shadow: 0 0 22px rgba(230,239,166,.45), 0 4px 16px rgba(0,0,0,.55); }
+.nav button svg { position: absolute; top: 11px; left: 50%; transform: translateX(-50%); width: 20px; height: 20px; opacity: .9; }
+
+.panel { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 18px 18px 8px; backdrop-filter: blur(6px); }
+.panel h2 { margin: 0 0 2px; font-size: 22px; font-weight: 500; letter-spacing: -0.01em; }
+.panel .sub { margin: 0 0 14px; font-size: 12.5px; color: var(--mute); }
+.empty { margin: 0; padding: 14px 0 18px; font-size: 13.5px; color: var(--mute); }
+
+.post { padding: 14px 0; border-top: 1px solid var(--line); }
+.post .meta { display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: #8d95ad; font-weight: 500; }
+.post .meta .tag { color: var(--orange); }
+.post.breaking .meta .tag { color: var(--red); }
+.post h3 { margin: 4px 0 3px; font-size: 18px; font-weight: 500; color: #f1f3fa; text-wrap: balance; }
+.post.breaking h3 { font-size: 20px; }
+.post p { margin: 0; font-size: 14px; color: var(--light); max-width: 62ch; text-wrap: pretty; white-space: pre-line; }
+.reacts { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; align-items: center; }
+.react, .linkbtn { font: inherit; font-size: 13px; font-weight: 400; color: var(--light); background: rgba(255,255,255,.06); border: 1px solid var(--line); border-radius: 999px; padding: 3px 10px; cursor: pointer; line-height: 1.5; }
+.react:hover, .linkbtn:hover { background: rgba(255,255,255,.12); }
+.react[aria-pressed="true"] { background: rgba(238,90,160,.22); border-color: var(--pink); color: #fff; }
+.react:focus-visible, .linkbtn:focus-visible { outline: 2px solid var(--title); outline-offset: 2px; }
+.linkbtn { margin-left: auto; }
+.thread { margin-top: 10px; padding-left: 12px; border-left: 2px solid rgba(255,255,255,.12); }
+.thread[hidden] { display: none; }
+.cm { padding: 6px 0; font-size: 13.5px; }
+.cm b { color: var(--blue); font-weight: 500; margin-right: 6px; }
+.cm span.when { color: #7d839a; font-size: 11.5px; margin-left: 6px; }
+.cm p { display: inline; font-size: 13.5px; white-space: pre-line; }
+
+form.f { display: grid; gap: 10px; }
+form.f .row { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+form.f label { display: block; font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: #8d95ad; font-weight: 500; margin-bottom: 4px; }
+form.f input, form.f textarea { width: 100%; font: inherit; font-weight: 400; font-size: 14px; color: #f1f3fa; background: var(--field); border: 1px solid #2a2e42; border-radius: 8px; padding: 9px 11px; }
+form.f input[type="date"] { color-scheme: dark; }
+form.f textarea { resize: vertical; min-height: 64px; }
+form.f input:focus, form.f textarea:focus { outline: 2px solid var(--blue); outline-offset: 1px; border-color: transparent; }
+form.f .hp { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
+form.f .hint { margin: 0; font-size: 12px; color: var(--mute); }
+button.send { font: inherit; font-weight: 600; font-size: 13px; letter-spacing: .1em; text-transform: uppercase; background: var(--pink); color: #1a0711; border: 0; border-radius: 8px; padding: 11px 18px; cursor: pointer; justify-self: start; }
+button.send:hover { filter: brightness(1.08); }
+button.send:disabled { opacity: .6; cursor: default; }
+button.send:focus-visible { outline: 2px solid var(--title); outline-offset: 3px; }
+.status { margin: 0; min-height: 1.3em; font-size: 13px; color: var(--green); }
+.status.err { color: var(--orange); }
+.thread form.f { margin: 8px 0 6px; }
+.thread button.send { padding: 8px 14px; font-size: 12px; }
+
+.tiles { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; padding-bottom: 14px; }
+.tile { position: relative; aspect-ratio: 1; border-radius: 8px; overflow: hidden; background: #1b2236; }
+.tile canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+.tile span { position: absolute; left: 8px; right: 8px; bottom: 7px; font-size: 11.5px; font-weight: 500; color: #fff; text-shadow: 0 1px 8px rgba(0,0,0,.8); line-height: 1.25; }
+
+.invite { display: grid; grid-template-columns: 74px minmax(0, 1fr); gap: 14px; padding: 13px 0; border-top: 1px solid var(--line); }
+.invite .date { text-align: center; border: 1px solid var(--pink); color: var(--pink); border-radius: 8px; padding: 6px 4px; line-height: 1.1; align-self: start; }
+.invite .date b { display: block; font-size: 24px; font-weight: 500; }
+.invite .date span { font-size: 10.5px; letter-spacing: .18em; text-transform: uppercase; }
+.invite h3 { margin: 0 0 3px; font-size: 16.5px; font-weight: 500; color: #f1f3fa; }
+.invite p { margin: 0; font-size: 13.5px; color: var(--light); white-space: pre-line; }
+.invite em { font-style: normal; color: var(--pink); font-size: 11px; letter-spacing: .14em; text-transform: uppercase; font-weight: 500; }
+.submit-box { border-top: 1px solid var(--line); margin-top: 6px; padding: 16px 0 12px; }
+.submit-box h3 { margin: 0 0 2px; font-size: 18px; font-weight: 500; color: var(--pink); }
+.submit-box .sub { margin: 0 0 12px; }
+
+.links { list-style: none; margin: 0; padding: 0 0 8px; }
+.links li { padding: 12px 0; border-top: 1px solid var(--line); }
+.links a { color: var(--green); font-size: 17px; font-weight: 500; text-decoration: none; border-bottom: 1px solid rgba(126,217,87,.4); }
+.links p { margin: 3px 0 0; font-size: 13px; color: var(--mute); }
+
+footer { margin-top: 22px; text-align: center; font-size: 11.5px; color: #7d839a; }
+
+@media (max-width: 760px) {
+  .grid { grid-template-columns: minmax(0, 1fr); gap: 20px; }
+  .nav { flex-direction: row; flex-wrap: wrap; justify-content: center; order: -1; gap: 12px; }
+  .menu { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px 16px; }
+  .menu .t { max-width: none; }
+  form.f .row { grid-template-columns: minmax(0, 1fr); }
+  button.send { width: 100%; }
+}
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+</head>
+<body>
+
+<canvas id="city" aria-hidden="true"></canvas>
+
+<div class="stage">
+  <h1 class="mark">eau claire gossip<small>the Chippewa Valley, whispered</small></h1>
+
+  <button type="button" class="ticker" id="ticker" hidden><b>BREAKING</b><span id="ticker-text"></span></button>
+
+  <div class="grid">
+    <nav class="menu" aria-label="Sections">
+      <button class="item c-blue" data-go="home" type="button"><span class="h">welcome</span><span class="t">to Eau Claire Gossip! The site ABOUT the Chippewa Valley, FOR the Chippewa Valley and BY the Chippewa Valley!</span></button>
+      <button class="item c-orange" data-go="posts" type="button"><span class="h">gossip</span><span class="t">The latest scoop on everyone who is anyone from Water Street to Altoona.</span></button>
+      <button class="item c-red" data-go="news" type="button"><span class="h">breaking</span><span class="t">The big stuff, the second we hear it.</span></button>
+      <button class="item c-yellow" data-go="pics" type="button"><span class="h">pics</span><span class="t">See who was seen where. Open the spotted gallery.</span></button>
+      <button class="item c-pink" data-go="parties" type="button"><span class="h">parties</span><span class="t">Your invitation got lost in the mail. See what you missed, or tell us about yours.</span></button>
+      <button class="item c-green" data-go="links" type="button"><span class="h">links</span><span class="t">Where to hear more, if you must.</span></button>
+    </nav>
+
+    <main id="main">
+      <section id="v-home" aria-live="polite">
+        <article class="card">
+          <h2 id="sp-title">Spotted:</h2>
+          <div class="photo"><canvas id="sp-photo" width="640" height="544"></canvas>
+            <div class="where"><span id="sp-where"></span><span id="sp-when"></span></div>
+          </div>
+          <p class="blurb" id="sp-blurb"></p>
+          <div class="sig"><span>xoxo, <b>THE VALLEY'S OWN</b></span>
+            <div class="pager" id="pager"><button type="button" id="prev" aria-label="Previous sighting">&#8249;</button><button type="button" id="next" aria-label="Next sighting">&#8250;</button></div>
+          </div>
+          <div class="dots" id="dots"></div>
+        </article>
+      </section>
+
+      <section id="v-posts" class="panel" hidden>
+        <h2>gossip</h2>
+        <p class="sub">React, comment, repeat. Comments appear after the owner approves them.</p>
+        <div id="postlist"></div>
+      </section>
+
+      <section id="v-news" class="panel" hidden>
+        <h2>breaking</h2>
+        <p class="sub">Big gossip only.</p>
+        <div id="newslist"></div>
+      </section>
+
+      <section id="v-pics" class="panel" hidden>
+        <h2>pics</h2>
+        <p class="sub">Spotted around town.</p>
+        <div class="tiles" id="tiles"></div>
+        <p class="empty" id="pics-empty" hidden>Nothing here yet.</p>
+      </section>
+
+      <section id="v-parties" class="panel" hidden>
+        <h2>parties</h2>
+        <p class="sub">Parties people say they are throwing, checked by the owner before they show up here.</p>
+        <div id="invites"></div>
+        <p class="empty" id="parties-empty" hidden>No parties listed yet. Be the first to tell us about one.</p>
+        <div class="submit-box">
+          <h3>throwing a party?</h3>
+          <p class="sub">Tell us about it. Please leave out home addresses; give a neighborhood or venue instead. Your contact info is only seen by the owner.</p>
+          <form class="f" id="partyform">
+            <div class="row">
+              <div><label for="pf-title">Party name</label><input id="pf-title" type="text" maxlength="80" required></div>
+              <div><label for="pf-date">Date</label><input id="pf-date" type="date" required></div>
+            </div>
+            <div><label for="pf-area">Neighborhood or venue</label><input id="pf-area" type="text" maxlength="60" placeholder="e.g. Third Ward"></div>
+            <div><label for="pf-details">Details</label><textarea id="pf-details" maxlength="400"></textarea></div>
+            <div><label for="pf-contact">Your contact (private, owner only)</label><input id="pf-contact" type="text" maxlength="100" placeholder="email or phone, optional"></div>
+            <div class="hp" aria-hidden="true"><label for="pf-web">Website</label><input id="pf-web" type="text" tabindex="-1" autocomplete="off"></div>
+            <button class="send" type="submit">Submit party</button>
+            <p class="status" id="pf-status" role="status"></p>
+          </form>
+        </div>
+      </section>
+
+      <section id="v-links" class="panel" hidden>
+        <h2>links</h2>
+        <p class="sub">Where to hear more.</p>
+        <ul class="links">
+          <!-- Add links like this:
+          <li><a href="https://example.com" target="_blank" rel="noopener">Link name</a><p>Short description.</p></li> -->
+        </ul>
+      </section>
+    </main>
+
+    <nav class="nav" aria-label="Quick navigation">
+      <button type="button" data-go="home" aria-label="home"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11 12 4l8 7v9h-5v-6H9v6H4z"/></svg>home</button>
+      <button type="button" data-go="posts" aria-label="gossip posts"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h16v11H9l-5 4z"/></svg>posts</button>
+      <button type="button" data-go="news" aria-label="breaking news"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M13 3 5 13h6l-1 8 8-10h-6z"/></svg>news</button>
+      <button type="button" data-go="parties" aria-label="parties"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 20 9 8l7 7z"/><path d="M14 5v2M19 9h-2M18 4l-1.5 1.5"/></svg>parties</button>
+      <button type="button" data-go="pics" aria-label="pics"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="9" cy="11" r="2"/><path d="m4 18 6-5 4 3 3-2 4 3"/></svg>pics</button>
+    </nav>
+  </div>
+
+</div>
+
+<script>
+(function () {
+  'use strict';
+  const reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const $ = (id) => document.getElementById(id);
+  const EMOJIS = ['🔥', '😂', '😱', '👀', '💅', '💔'];
+
+  function el(tag, cls, text) { const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; }
+  function rng(seed) { let s = seed >>> 0; return () => (s = (s * 1664525 + 1013904223) >>> 0) / 4294967296; }
+
+  /* anonymous visitor id, used so each person can toggle a reaction once */
+  let voter = '';
+  try { voter = localStorage.getItem('egs_voter') || ''; } catch (e) {}
+  if (!/^[A-Za-z0-9-]{8,64}$/.test(voter)) {
+    const a = new Uint8Array(16); crypto.getRandomValues(a);
+    voter = Array.from(a, (b) => b.toString(16).padStart(2, '0')).join('');
+    try { localStorage.setItem('egs_voter', voter); } catch (e) {}
+  }
+
+  async function api(path, opts) {
+    const res = await fetch('/api/' + path, opts);
+    let data = {};
+    try { data = await res.json(); } catch (e) {}
+    if (!res.ok) throw new Error(data.error || 'Something went wrong. Try again.');
+    return data;
+  }
+  const post = (path, body) => api(path, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(body) });
+
+  /* ---------- background ---------- */
+  const city = $('city');
+  function drawCity() {
+    const dpr = Math.min(window.devicePixelRatio || 1, 2), w = innerWidth, h = innerHeight;
+    city.width = w * dpr; city.height = h * dpr;
+    const g = city.getContext('2d'); g.scale(dpr, dpr);
+    g.fillStyle = '#07080d'; g.fillRect(0, 0, w, h);
+    const r = rng(11), hues = [200, 38, 48, 330, 130, 20, 210];
+    for (let i = 0; i < 90; i++) {
+      const x = r() * w, y = h * (0.35 + r() * 0.65), rad = 5 + r() * 20, hu = hues[Math.floor(r() * hues.length)];
+      const gr = g.createRadialGradient(x, y, 0, x, y, rad);
+      gr.addColorStop(0, 'hsla(' + hu + ',90%,65%,' + (0.25 + r() * 0.5) + ')');
+      gr.addColorStop(0.7, 'hsla(' + hu + ',90%,55%,0.18)');
+      gr.addColorStop(1, 'hsla(' + hu + ',90%,50%,0)');
+      g.fillStyle = gr; g.beginPath(); g.arc(x, y, rad, 0, 6.2832); g.fill();
+    }
+    g.fillStyle = 'rgba(5,6,10,.82)';
+    const bw = Math.max(40, w * 0.07);
+    for (let k = 0; k < 4; k++) {
+      const bh = h * (0.25 + r() * 0.25);
+      g.fillRect(k * bw * 0.9, h - bh, bw, bh);
+      g.fillRect(w - (k + 1) * bw * 0.9, h - bh * (0.8 + r() * 0.3), bw, bh);
+    }
+    for (let i = 0; i < 70; i++) {
+      const x = r() < 0.5 ? r() * w * 0.2 : w * 0.8 + r() * w * 0.2, y = h * (0.55 + r() * 0.45);
+      g.fillStyle = 'hsla(' + hues[Math.floor(r() * hues.length)] + ',90%,70%,' + (0.4 + r() * 0.5) + ')';
+      g.fillRect(x, y, 2.5, 3.5);
+    }
+  }
+  drawCity();
+  let rt; addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(drawCity, 150); });
+
+  function bokeh(cv, seed, hA, hB) {
+    const w = cv.width, h = cv.height, g = cv.getContext('2d'), r = rng(seed);
+    const bg = g.createLinearGradient(0, 0, w, h);
+    bg.addColorStop(0, 'hsl(' + hA + ',45%,22%)'); bg.addColorStop(1, 'hsl(' + hB + ',50%,12%)');
+    g.fillStyle = bg; g.fillRect(0, 0, w, h);
+    for (let i = 0; i < 46; i++) {
+      const x = r() * w, y = r() * h, rad = w * (0.02 + r() * 0.07), hu = r() < 0.5 ? hA : hB;
+      const gr = g.createRadialGradient(x, y, 0, x, y, rad);
+      gr.addColorStop(0, 'hsla(' + (hu + r() * 30 - 15) + ',85%,72%,' + (0.2 + r() * 0.5) + ')');
+      gr.addColorStop(0.8, 'hsla(' + hu + ',85%,60%,0.15)');
+      gr.addColorStop(1, 'hsla(' + hu + ',85%,55%,0)');
+      g.fillStyle = gr; g.beginPath(); g.arc(x, y, rad, 0, 6.2832); g.fill();
+    }
+    const cx = w * (0.4 + r() * 0.2), top = h * 0.3;
+    g.fillStyle = 'rgba(8,9,14,.94)';
+    g.beginPath(); g.ellipse(cx, top + h * 0.07, w * 0.065, h * 0.085, 0, 0, 6.2832); g.fill();
+    g.beginPath(); g.moveTo(cx - w * 0.3, h); g.quadraticCurveTo(cx - w * 0.28, top + h * 0.2, cx - w * 0.06, top + h * 0.17);
+    g.lineTo(cx + w * 0.06, top + h * 0.17); g.quadraticCurveTo(cx + w * 0.28, top + h * 0.2, cx + w * 0.3, h); g.closePath(); g.fill();
+    const vg = g.createRadialGradient(w / 2, h / 2, w * 0.3, w / 2, h / 2, w * 0.75);
+    vg.addColorStop(0, 'rgba(0,0,0,0)'); vg.addColorStop(1, 'rgba(0,0,0,.45)');
+    g.fillStyle = vg; g.fillRect(0, 0, w, h);
+  }
+
+  const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  function fmtTime(s) {
+    const d = new Date(String(s).replace(' ', 'T') + 'Z');
+    if (isNaN(d)) return '';
+    return d.toLocaleString([], { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' });
+  }
+
+  /* ---------- spotted card ---------- */
+  let spots = [], idx = 0, timer = null;
+  const elDots = $('dots');
+  function showSpot(n) {
+    const have = spots.length > 0;
+    idx = have ? ((n % spots.length) + spots.length) % spots.length : 0;
+    const s = have ? spots[idx] : { title: '', place: '', when_text: '', body: have ? '' : 'Nothing spotted yet. Check back soon.', hue_a: 215, hue_b: 275 };
+    $('sp-title').textContent = 'Spotted: ' + s.title;
+    $('sp-where').textContent = s.place; $('sp-when').textContent = s.when_text;
+    $('sp-blurb').textContent = s.body;
+    bokeh($('sp-photo'), 100 + idx * 7 + (s.id || 0), s.hue_a, s.hue_b);
+    elDots.replaceChildren();
+    if (spots.length > 1) spots.forEach((_, i) => elDots.appendChild(el('i', i === idx ? 'on' : '')));
+    $('pager').style.visibility = spots.length > 1 ? 'visible' : 'hidden';
+  }
+  function restart() { clearInterval(timer); if (!reduce && spots.length > 1) timer = setInterval(() => showSpot(idx + 1), 7000); }
+  $('next').addEventListener('click', () => { showSpot(idx + 1); restart(); });
+  $('prev').addEventListener('click', () => { showSpot(idx - 1); restart(); });
+
+  /* ---------- gossip + breaking posts ---------- */
+  function buildPost(p) {
+    const d = el('article', 'post' + (p.kind === 'breaking' ? ' breaking' : ''));
+    const m = el('div', 'meta');
+    m.append(el('span', '', fmtTime(p.created_at)), el('span', 'tag', p.tag || (p.kind === 'breaking' ? 'Breaking' : 'Gossip')));
+    d.append(m, el('h3', '', p.title));
+    if (p.body) d.append(el('p', '', p.body));
+
+    const rx = el('div', 'reacts');
+    const buttons = {};
+    function paint() {
+      EMOJIS.forEach((e) => {
+        const n = p.reactions[e] || 0;
+        buttons[e].textContent = n ? e + ' ' + n : e;
+        buttons[e].setAttribute('aria-pressed', p.mine.indexOf(e) > -1 ? 'true' : 'false');
+        buttons[e].setAttribute('aria-label', e + ' reaction, ' + n);
+      });
+    }
+    EMOJIS.forEach((e) => {
+      const b = el('button', 'react'); b.type = 'button'; buttons[e] = b;
+      b.addEventListener('click', async () => {
+        b.disabled = true;
+        try {
+          const r = await post('react', { post_id: p.id, emoji: e, voter });
+          p.reactions = r.reactions; p.mine = r.mine; paint();
+        } catch (err) { /* leave counts as they were */ }
+        b.disabled = false;
+      });
+      rx.appendChild(b);
+    });
+    const toggle = el('button', 'linkbtn'); toggle.type = 'button';
+    const thread = el('div', 'thread'); thread.hidden = true;
+    function paintToggle() { toggle.textContent = '💬 Comments' + (p.comments.length ? ' (' + p.comments.length + ')' : ''); toggle.setAttribute('aria-expanded', thread.hidden ? 'false' : 'true'); }
+    toggle.addEventListener('click', () => { thread.hidden = !thread.hidden; paintToggle(); });
+    rx.appendChild(toggle);
+    paint(); paintToggle();
+    d.appendChild(rx);
+
+    const list = el('div', 'list');
+    function paintComments() {
+      list.replaceChildren();
+      if (!p.comments.length) list.appendChild(el('p', 'empty', 'No comments yet.'));
+      p.comments.forEach((c) => {
+        const row = el('div', 'cm');
+        row.append(el('b', '', c.name), el('p', '', c.body), el('span', 'when', fmtTime(c.created_at)));
+        list.appendChild(row);
+      });
+    }
+    paintComments();
+    const form = el('form', 'f');
+    const uid = 'c' + p.id;
+    form.innerHTML = '<div><label for="' + uid + 'n">Name (optional)</label><input id="' + uid + 'n" type="text" maxlength="40" autocomplete="nickname"></div>' +
+      '<div><label for="' + uid + 'b">Comment</label><textarea id="' + uid + 'b" maxlength="500" required></textarea></div>' +
+      '<div class="hp" aria-hidden="true"><input id="' + uid + 'w" type="text" tabindex="-1" autocomplete="off"></div>' +
+      '<button class="send" type="submit">Post comment</button><p class="status" role="status"></p>';
+    const status = form.querySelector('.status'), btn = form.querySelector('button');
+    form.addEventListener('submit', async (ev) => {
+      ev.preventDefault();
+      btn.disabled = true; status.className = 'status'; status.textContent = '';
+      try {
+        await post('comments', { post_id: p.id, name: $(uid + 'n').value, body: $(uid + 'b').value, hp: $(uid + 'w').value });
+        form.reset();
+        status.textContent = 'Thanks! Your comment will show up once the owner approves it.';
+      } catch (err) { status.className = 'status err'; status.textContent = err.message; }
+      btn.disabled = false;
+    });
+    thread.append(list, form);
+    d.appendChild(thread);
+    return d;
+  }
+
+  function fillPosts(container, posts, emptyText) {
+    container.replaceChildren();
+    if (!posts.length) { container.appendChild(el('p', 'empty', emptyText)); return; }
+    posts.forEach((p) => container.appendChild(buildPost(p)));
+  }
+
+  /* ---------- loaders ---------- */
+  const loaders = {
+    async home() {
+      const r = await api('posts?kind=spotted');
+      spots = r.posts; showSpot(0); restart();
+    },
+    async posts() {
+      const r = await api('posts?kind=gossip&voter=' + voter);
+      fillPosts($('postlist'), r.posts, 'No gossip yet. Check back soon.');
+    },
+    async news() {
+      const r = await api('posts?kind=breaking&voter=' + voter);
+      fillPosts($('newslist'), r.posts, 'No breaking news right now.');
+      showTicker(r.posts[0]);
+    },
+    async pics() {
+      const r = await api('posts?kind=pic');
+      const t = $('tiles'); t.replaceChildren();
+      $('pics-empty').hidden = r.posts.length > 0;
+      r.posts.forEach((p) => {
+        const tile = el('div', 'tile'), c = document.createElement('canvas'); c.width = 300; c.height = 300;
+        tile.append(c, el('span', '', p.title)); t.appendChild(tile);
+        bokeh(c, 40 + p.id, p.hue_a, p.hue_b);
+      });
+    },
+    async parties() {
+      const r = await api('parties');
+      const box = $('invites'); box.replaceChildren();
+      $('parties-empty').hidden = r.parties.length > 0;
+      r.parties.forEach((v) => {
+        const parts = v.party_date.split('-');
+        const d = el('div', 'invite'), dt = el('div', 'date');
+        dt.append(el('b', '', String(Number(parts[2]))), el('span', '', MONTHS[Number(parts[1]) - 1] || ''));
+        const body = el('div');
+        body.append(el('em', '', v.area || 'Location hush-hush'), el('h3', '', v.title));
+        if (v.details) body.append(el('p', '', v.details));
+        d.append(dt, body); box.appendChild(d);
+      });
+    },
+    async links() {}
+  };
+  function showTicker(p) {
+    const t = $('ticker');
+    if (!p) { t.hidden = true; return; }
+    $('ticker-text').textContent = p.title; t.hidden = false;
+  }
+  $('ticker').addEventListener('click', () => go('news'));
+
+  /* ---------- navigation ---------- */
+  const views = ['home', 'posts', 'news', 'pics', 'parties', 'links'];
+  function go(name) {
+    views.forEach((v) => { $('v-' + v).hidden = v !== name; });
+    document.querySelectorAll('[data-go]').forEach((b) => {
+      if (b.getAttribute('data-go') === name) b.setAttribute('aria-current', 'true'); else b.removeAttribute('aria-current');
+    });
+    loaders[name]().catch(() => {});
+  }
+  document.querySelectorAll('[data-go]').forEach((b) => b.addEventListener('click', () => go(b.getAttribute('data-go'))));
+
+  /* ---------- party submission ---------- */
+  const pf = $('partyform'), pfs = $('pf-status');
+  pf.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const btn = pf.querySelector('button'); btn.disabled = true; pfs.className = 'status'; pfs.textContent = '';
+    try {
+      await post('parties', { title: $('pf-title').value, date: $('pf-date').value, area: $('pf-area').value, details: $('pf-details').value, contact: $('pf-contact').value, hp: $('pf-web').value });
+      pf.reset();
+      pfs.textContent = 'Got it! The owner will review your party before it is listed.';
+    } catch (err) { pfs.className = 'status err'; pfs.textContent = err.message; }
+    btn.disabled = false;
+  });
+
+  go('home');
+  loaders.news().catch(() => {}); // fills the breaking ticker on first load
+})();
+</script>
+</body>
+</html>
