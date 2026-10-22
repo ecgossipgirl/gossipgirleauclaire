@@ -1,0 +1,251 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<title>Eau Claire Gossip Owner</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Jost:wght@300;400;500;600&display=swap">
+<style>
+/* Owner desk: plain, high-contrast, one column. Login first, then three tabs: submissions, comments, posts. */
+:root {
+  --bg: #0c0e17; --panel: #141726; --field: #0b0d16; --line: #272b40;
+  --fg: #e9ebf4; --mute: #98a0b8; --title: #e6efa6;
+  --pink: #ee5aa0; --green: #7ed957; --orange: #f08a3c; --red: #ff5a5f; --blue: #2aa8e0;
+  --display: "Jost", "Century Gothic", "Avenir Next", sans-serif;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html, body { background: var(--bg); }
+body { margin: 0; color: var(--fg); font-family: var(--display); font-weight: 400; line-height: 1.45;
+  padding-block: 24px 60px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+.wrap { max-width: 860px; margin: 0 auto; }
+header { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; flex-wrap: wrap; margin-bottom: 18px; }
+h1 { margin: 0; font-size: 28px; font-weight: 300; letter-spacing: -0.02em; color: var(--title); }
+h1 small { font-size: 12px; letter-spacing: .2em; text-transform: uppercase; color: var(--mute); margin-left: 10px; font-weight: 500; }
+a.site { color: var(--blue); font-size: 14px; }
+.box { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 18px; }
+.box[hidden], [hidden] { display: none !important; }
+label { display: block; font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--mute); font-weight: 500; margin-bottom: 4px; }
+input, textarea, select { width: 100%; font: inherit; font-size: 14px; color: var(--fg); background: var(--field); border: 1px solid var(--line); border-radius: 8px; padding: 9px 11px; }
+textarea { resize: vertical; min-height: 72px; }
+input:focus, textarea:focus, select:focus { outline: 2px solid var(--blue); outline-offset: 1px; border-color: transparent; }
+form.f { display: grid; gap: 12px; }
+.row { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; }
+.row > * { min-width: 0; }
+button { font: inherit; cursor: pointer; }
+button.primary { font-weight: 600; font-size: 13px; letter-spacing: .1em; text-transform: uppercase; background: var(--pink); color: #1a0711; border: 0; border-radius: 8px; padding: 10px 18px; justify-self: start; }
+button.primary:disabled { opacity: .6; cursor: default; }
+button:focus-visible, a:focus-visible { outline: 2px solid var(--title); outline-offset: 2px; }
+button.ghost { background: transparent; color: var(--fg); border: 1px solid var(--line); border-radius: 8px; padding: 6px 12px; font-size: 13px; }
+button.ghost:hover { border-color: var(--mute); }
+button.ok { color: var(--green); border-color: rgba(126,217,87,.5); }
+button.warn { color: var(--orange); border-color: rgba(240,138,60,.5); }
+button.del { color: var(--red); border-color: rgba(255,90,95,.5); }
+button.del.armed { background: var(--red); color: #20080a; }
+.msg { margin: 0; min-height: 1.3em; font-size: 13px; color: var(--green); }
+.msg.err { color: var(--orange); }
+
+.tabs { display: flex; gap: 6px; flex-wrap: wrap; margin: 0 0 14px; }
+.tabs button { background: transparent; color: var(--mute); border: 1px solid var(--line); border-radius: 999px; padding: 7px 16px; font-size: 14px; }
+.tabs button[aria-selected="true"] { background: var(--title); color: #1b1d0a; border-color: var(--title); font-weight: 500; }
+.badge { display: inline-block; min-width: 20px; padding: 0 6px; margin-left: 6px; border-radius: 999px; background: var(--red); color: #20080a; font-size: 12px; font-weight: 600; text-align: center; }
+.badge:empty { display: none; }
+
+.item { padding: 14px 0; border-top: 1px solid var(--line); display: grid; gap: 6px; }
+.item:first-child { border-top: 0; }
+.item .top { display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; align-items: baseline; }
+.item h3 { margin: 0; font-size: 17px; font-weight: 500; overflow-wrap: anywhere; }
+.item p { margin: 0; white-space: pre-line; overflow-wrap: anywhere; color: #d6d9e6; }
+.item .meta { font-size: 12.5px; color: var(--mute); overflow-wrap: anywhere; }
+.pill { font-size: 11px; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; padding: 2px 9px; border-radius: 999px; border: 1px solid var(--line); color: var(--mute); }
+.pill.pending { color: var(--orange); border-color: rgba(240,138,60,.6); }
+.pill.approved { color: var(--green); border-color: rgba(126,217,87,.6); }
+.pill.rejected, .pill.hidden { color: var(--red); border-color: rgba(255,90,95,.6); }
+.actions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 4px; }
+.empty { color: var(--mute); margin: 6px 0; }
+.sect { margin: 0 0 12px; font-size: 20px; font-weight: 500; }
+.gap { height: 22px; }
+.help { margin: 0 0 12px; font-size: 13px; color: var(--mute); }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>eau claire gossip<small>owner</small></h1>
+    <span><a class="site" href="/">View site</a> <button class="ghost" id="logout" type="button" hidden>Log out</button></span>
+  </header>
+
+  <section class="box" id="login" hidden>
+    <form class="f" id="loginform">
+      <div><label for="pw">Owner password</label><input id="pw" type="password" autocomplete="current-password" required></div>
+      <button class="primary" type="submit">Log in</button>
+      <p class="msg" id="login-msg" role="status"></p>
+    </form>
+  </section>
+
+  <section id="desk" hidden>
+    <div class="tabs" role="tablist">
+      <button type="button" role="tab" data-tab="parties" aria-selected="true">Party submissions<span class="badge" id="b-parties"></span></button>
+      <button type="button" role="tab" data-tab="comments" aria-selected="false">Comments<span class="badge" id="b-comments"></span></button>
+      <button type="button" role="tab" data-tab="posts" aria-selected="false">Posts</button>
+    </div>
+
+    <div class="box" id="t-parties"></div>
+    <div class="box" id="t-comments" hidden></div>
+    <div class="box" id="t-posts" hidden>
+      <h2 class="sect">New post</h2>
+      <p class="help">Spotted posts fill the card on the home page. Pic posts show in the gallery. Gossip and breaking posts get reactions and comments. Colors are optional hue numbers from 0 to 360.</p>
+      <form class="f" id="postform">
+        <div class="row">
+          <div><label for="np-kind">Type</label><select id="np-kind"><option value="gossip">Gossip</option><option value="breaking">Breaking news</option><option value="spotted">Spotted (home card)</option><option value="pic">Pic (gallery)</option></select></div>
+          <div><label for="np-tag">Tag (optional)</label><input id="np-tag" type="text" maxlength="30" placeholder="Blind item"></div>
+        </div>
+        <div><label for="np-title">Headline, or name for Spotted</label><input id="np-title" type="text" maxlength="120" required></div>
+        <div><label for="np-body">Text</label><textarea id="np-body" maxlength="1500"></textarea></div>
+        <div class="row">
+          <div><label for="np-place">Place (Spotted)</label><input id="np-place" type="text" maxlength="60"></div>
+          <div><label for="np-when">Time (Spotted)</label><input id="np-when" type="text" maxlength="30" placeholder="4:52 pm"></div>
+          <div><label for="np-ha">Color 1</label><input id="np-ha" type="number" min="0" max="360"></div>
+          <div><label for="np-hb">Color 2</label><input id="np-hb" type="number" min="0" max="360"></div>
+        </div>
+        <button class="primary" type="submit">Publish</button>
+        <p class="msg" id="post-msg" role="status"></p>
+      </form>
+      <div class="gap"></div>
+      <h2 class="sect">Published posts</h2>
+      <div id="postlist"></div>
+    </div>
+  </section>
+</div>
+
+<script>
+(function () {
+  'use strict';
+  const $ = (id) => document.getElementById(id);
+  function el(tag, cls, text) { const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; }
+  async function api(path, opts) {
+    const res = await fetch('/api/' + path, opts);
+    let data = {}; try { data = await res.json(); } catch (e) {}
+    if (res.status === 401 && path !== 'admin/login') { showLogin(); throw new Error('Logged out.'); }
+    if (!res.ok) throw new Error(data.error || 'Something went wrong.');
+    return data;
+  }
+  const send = (method, path, body) => api(path, { method, headers: { 'content-type': 'application/json' }, body: JSON.stringify(body || {}) });
+  const when = (s) => { const d = new Date(String(s).replace(' ', 'T') + 'Z'); return isNaN(d) ? '' : d.toLocaleString([], { month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit' }); };
+
+  let data = { parties: [], comments: [], posts: [] };
+
+  function showLogin() { $('login').hidden = false; $('desk').hidden = true; $('logout').hidden = true; }
+  function showDesk() { $('login').hidden = true; $('desk').hidden = false; $('logout').hidden = false; }
+
+  async function boot() {
+    try {
+      const me = await api('admin/me');
+      if (!me.admin) return showLogin();
+      showDesk(); await load();
+    } catch (e) { showLogin(); }
+  }
+  async function load() { data = await api('admin/overview'); render(); }
+
+  $('loginform').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const m = $('login-msg'); m.className = 'msg'; m.textContent = '';
+    try { await send('POST', 'admin/login', { password: $('pw').value }); $('pw').value = ''; showDesk(); await load(); }
+    catch (err) { m.className = 'msg err'; m.textContent = err.message; }
+  });
+  $('logout').addEventListener('click', async () => { try { await send('POST', 'admin/logout'); } catch (e) {} showLogin(); });
+
+  document.querySelectorAll('[data-tab]').forEach((b) => b.addEventListener('click', () => {
+    const t = b.getAttribute('data-tab');
+    document.querySelectorAll('[data-tab]').forEach((x) => x.setAttribute('aria-selected', x === b ? 'true' : 'false'));
+    ['parties', 'comments', 'posts'].forEach((n) => { $('t-' + n).hidden = n !== t; });
+  }));
+
+  /* two-click delete: first click arms, second click deletes */
+  function delButton(run) {
+    const b = el('button', 'ghost del', 'Delete'); b.type = 'button'; let timer;
+    b.addEventListener('click', async () => {
+      if (!b.classList.contains('armed')) {
+        b.classList.add('armed'); b.textContent = 'Click again to delete';
+        timer = setTimeout(() => { b.classList.remove('armed'); b.textContent = 'Delete'; }, 4000); return;
+      }
+      clearTimeout(timer); b.disabled = true;
+      try { await run(); await load(); } catch (err) { b.disabled = false; }
+    });
+    return b;
+  }
+  function actionBtn(label, cls, run) {
+    const b = el('button', 'ghost ' + cls, label); b.type = 'button';
+    b.addEventListener('click', async () => { b.disabled = true; try { await run(); await load(); } catch (err) { b.disabled = false; } });
+    return b;
+  }
+
+  function render() {
+    const pendP = data.parties.filter((p) => p.status === 'pending').length;
+    const pendC = data.comments.filter((c) => c.status === 'pending').length;
+    $('b-parties').textContent = pendP || ''; $('b-comments').textContent = pendC || '';
+
+    // party submissions
+    const tp = $('t-parties'); tp.replaceChildren(el('h2', 'sect', 'Party submissions'));
+    tp.appendChild(el('p', 'help', 'Everything people sent in, newest pending first. Only approved parties show on the public site. Contact details are shown here only.'));
+    if (!data.parties.length) tp.appendChild(el('p', 'empty', 'No submissions yet.'));
+    data.parties.forEach((p) => {
+      const it = el('div', 'item'), top = el('div', 'top');
+      top.append(el('h3', '', p.title), el('span', 'pill ' + p.status, p.status));
+      it.append(top, el('div', 'meta', 'Date: ' + p.party_date + (p.area ? '  ·  Area: ' + p.area : '') + '  ·  Sent ' + when(p.created_at)));
+      if (p.details) it.append(el('p', '', p.details));
+      it.append(el('div', 'meta', 'Contact (private): ' + (p.contact || 'none given')));
+      const a = el('div', 'actions');
+      if (p.status !== 'approved') a.append(actionBtn('Approve', 'ok', () => send('POST', 'admin/parties/' + p.id, { status: 'approved' })));
+      if (p.status !== 'rejected') a.append(actionBtn('Reject', 'warn', () => send('POST', 'admin/parties/' + p.id, { status: 'rejected' })));
+      if (p.status !== 'pending') a.append(actionBtn('Back to pending', '', () => send('POST', 'admin/parties/' + p.id, { status: 'pending' })));
+      a.append(delButton(() => send('DELETE', 'admin/parties/' + p.id)));
+      it.append(a); tp.appendChild(it);
+    });
+
+    // comments
+    const tc = $('t-comments'); tc.replaceChildren(el('h2', 'sect', 'Comments'));
+    tc.appendChild(el('p', 'help', 'New comments wait here until you approve them. Hidden comments stay saved but are not shown.'));
+    if (!data.comments.length) tc.appendChild(el('p', 'empty', 'No comments yet.'));
+    data.comments.forEach((c) => {
+      const it = el('div', 'item'), top = el('div', 'top');
+      top.append(el('h3', '', c.name), el('span', 'pill ' + c.status, c.status));
+      it.append(top, el('p', '', c.body), el('div', 'meta', 'On: ' + (c.post_title || '(deleted post)') + '  ·  ' + when(c.created_at)));
+      const a = el('div', 'actions');
+      if (c.status !== 'approved') a.append(actionBtn('Approve', 'ok', () => send('POST', 'admin/comments/' + c.id, { status: 'approved' })));
+      if (c.status !== 'hidden') a.append(actionBtn('Hide', 'warn', () => send('POST', 'admin/comments/' + c.id, { status: 'hidden' })));
+      a.append(delButton(() => send('DELETE', 'admin/comments/' + c.id)));
+      it.append(a); tc.appendChild(it);
+    });
+
+    // posts
+    const pl = $('postlist'); pl.replaceChildren();
+    if (!data.posts.length) pl.appendChild(el('p', 'empty', 'No posts yet.'));
+    data.posts.forEach((p) => {
+      const it = el('div', 'item'), top = el('div', 'top');
+      top.append(el('h3', '', p.title), el('span', 'pill', p.kind));
+      it.append(top, el('div', 'meta', when(p.created_at) + (p.tag ? '  ·  ' + p.tag : '')));
+      const a = el('div', 'actions'); a.append(delButton(() => send('DELETE', 'admin/posts/' + p.id)));
+      it.append(a); pl.appendChild(it);
+    });
+  }
+
+  $('postform').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const m = $('post-msg'), btn = e.target.querySelector('button'); m.className = 'msg'; m.textContent = ''; btn.disabled = true;
+    try {
+      await send('POST', 'admin/posts', {
+        kind: $('np-kind').value, title: $('np-title').value, body: $('np-body').value, tag: $('np-tag').value,
+        place: $('np-place').value, when_text: $('np-when').value, hue_a: $('np-ha').value, hue_b: $('np-hb').value
+      });
+      e.target.reset(); m.textContent = 'Published. It is live on the site now.'; await load();
+    } catch (err) { m.className = 'msg err'; m.textContent = err.message; }
+    btn.disabled = false;
+  });
+
+  boot();
+})();
+</script>
+</body>
+</html>
