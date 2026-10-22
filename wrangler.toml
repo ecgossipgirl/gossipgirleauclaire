@@ -1,0 +1,8 @@
+name = "eau-claire-gossip"
+pages_build_output_dir = "./public"
+compatibility_date = "2026-10-01"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "eau-claire-gossip"
+database_id = "13ec7f13-45c1-4616-a04b-d9e1c9af844a"
